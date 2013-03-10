@@ -1,13 +1,5 @@
 import re,sys,string,collections
 
-f = open('parasites.txt', 'r')
-all = f.read()
-f.close()
-
-tmp = re.split("\r\r\r ", all)
-res = re.findall('(Parasite: )([\w,\s]+)', tmp[0])
-
-
 def readFile(filename):
 	f = open(filename, 'r')
 	alldat = f.read()
