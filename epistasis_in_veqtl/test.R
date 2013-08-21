@@ -13,6 +13,10 @@ microbenchmark(
 	for(i in 1:20) anova(lm(y ~ as.factor(x)*as.factor(X[,i])))
 )
 
+microbenchmark(
+	scan4df(y, X, x),
+	for(i in 1:20) anova(lm(y ~ as.factor(x):as.factor(X[,i])))
+)
 
 
 dat <- read.plink(bed="/Users/ghemani/Documents/WORK/data/chinese_ra/dataSASfilter.Quality.hwe1e-3.autosome")

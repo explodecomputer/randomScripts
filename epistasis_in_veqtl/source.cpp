@@ -117,13 +117,13 @@ NumericVector ftest8df(NumericVector y, NumericVector X1, NumericVector X2)
 }
 
 // [[Rcpp::export]]
-NumericVector ftest8df(NumericVector y, NumericVector X1, NumericVector X2)
+NumericVector ftest4df(NumericVector y, NumericVector X1, NumericVector X2)
 {
 	int n = X1.size();
 	int n1 = X2.size();
 
 	int i, nfac, factor_count[9];
-	double MSB, MSW, SSB = 0, SSW = 0, SSI = 0, SSD, mY = 0;
+	double MSB, MSW, SSB = 0, SSW = 0, SSI = 0, SSD, mY = 0, df1, df2;
 	double mY_fac[9];
 	double mean_row[3], mean_col[3];
 
@@ -183,7 +183,7 @@ NumericVector ftest8df(NumericVector y, NumericVector X1, NumericVector X2)
 	}
 
 	df1 = nfac - 1;
-	df2 = n - nfac;
+	df2 = n - df1;
 	SSD = SSW - SSB;
 
 	MSB = SSB / df1;
