@@ -58,3 +58,4 @@ snplist <- scan(snplistfile, what="character")
 snpdat <- findChromosomesAll(snplist, plinkrt)
 extractSnpsAll(snpdat, plinkrt)
 
+# info files
