@@ -1,4 +1,4 @@
-# R --args snplist.txt ~/ibimp/arichu/data/imputed/chr\*/arichu_1kg_p1v3_\*
+# R --args snplist.txt ~/ibimp/arichu/data/imputed/chr\*/arichu_1kg_p1v3_\* outputfile
 
 
 library(snpStats)
@@ -88,8 +88,8 @@ output <- ar[3]
 
 snplist <- scan(snplistfile, what="character")
 snpdat <- findChromosomesAll(snplist, plinkrt)
-dat <- extractSnpsAll(snpdat, plinkrt)
 info <- extractInfoAll(snpdat, plinkrt)
+dat <- extractSnpsAll(snpdat, plinkrt)
 
 
 write.table(info, file=paste(output, "_info.txt", sep=""), row=F, col=F, qu=F)
