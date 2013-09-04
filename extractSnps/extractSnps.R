@@ -83,6 +83,7 @@ extractInfoAll <- function(snpdat, plinkrt)
 ar <- commandArgs(T)
 snplistfile <- ar[1]
 plinkrt <- ar[2]
+output <- ar[3]
 
 
 snplist <- scan(snplistfile, what="character")
@@ -91,4 +92,5 @@ dat <- extractSnpsAll(snpdat, plinkrt)
 info <- extractInfoAll(snpdat, plinkrt)
 
 
-# info files
+write.table(info, file=paste(output, "_info.txt", sep=""), row=F, col=F, qu=F)
+write.plink(file.base = output, snps = dat$genotypes, subject.data = dat$fam, chromosome = dat$map$chromosome, position = dat$map$position, allele.1 = dat$map$allele.1, allele.2 = dat$map$allele.2)
