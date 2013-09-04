@@ -23,6 +23,7 @@ findChromosomesAll <- function(snplist, plinkrt)
 		chr[i] <- ifelse(is.null(a), NA, a)
 	}
 	dat <- data.frame(snp = snplist, chr = as.numeric(chr))
+	dat <- subset(dat, !is.na(chr))
 	dat$snp <- as.character(dat$snp)
 	dat <- dat[order(dat$chr), ]
 	return(dat)
