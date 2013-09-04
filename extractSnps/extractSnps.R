@@ -1,11 +1,15 @@
+# R --args snplist.txt ~/ibimp/arichu/data/imputed/chr\*/arichu_1kg_p1v3_\*
+
+
 library(snpStats)
 
 
 findChromosomes <- function(snp, plinkrt)
 {
-	cmd <- paste("grep ", snp, " ", plinkrt, ".bim | head -n 1 | cut -d \":\" -f 2 | cut -f 1", sep="")
-	print(snp)
+	cmd <- paste("grep -P -m 1 '", snp, "\t' ", plinkrt, ".bim | head -n 1 | cut -d \":\" -f 2 | cut -f 1", sep="")
+	cat(snp)
 	chr <- system(cmd, intern=TRUE)
+	cat(" ", chr, "\n")
 	return(chr)
 }
 
@@ -19,7 +23,7 @@ findChromosomesAll <- function(snplist, plinkrt)
 		chr[i] <- ifelse(is.null(a), NA, a)
 	}
 	dat <- data.frame(snp = snplist, chr = as.numeric(chr))
-	snpdat$snp <- as.character(snpdat$snp)
+	dat$snp <- as.character(dat$snp)
 	dat <- dat[order(dat$chr), ]
 	return(dat)
 }
@@ -37,15 +41,42 @@ extractSnpsAll <- function(snpdat, plinkrt)
 {
 	chr <- unique(snpdat$chr)
 	l <- length(chr)
-	dat <- NULL
-	for(i in 1:l)
+
+	cat(chr[1], ":", snpdat$snp[snpdat$chr == chr[1]], "\n")
+	dat <- extractSnps(snpdat$snp[snpdat$chr == chr[1]], gsub("\\*", chr[1], plinkrt))
+
+	for(i in 2:l)
 	{
-		nom <- gsub("\\*", chr[i], plinkrt)
-		snps <- snpdat$snp[snpdat$chr == chr[i]]
-		cat(i, ":", chr[i], ":", snps, "\n")
-		dat <- cbind(dat, extractSnps(snps, nom))
+		cat(chr[i], ":", snpdat$snp[snpdat$chr == chr[i]], "\n")
+		dat1 <- extractSnps(snpdat$snp[snpdat$chr == chr[i]], gsub("\\*", chr[i], plinkrt))
+		dat$map <- rbind(dat$map, dat1$map)
+		dat$genotypes <- cbind(dat$genotypes, dat1$genotypes)
 	}
 	return(dat)
+}
+
+extractInfo <- function(snp, plinkrt)
+{
+	cmd <- paste("zgrep -P '", snp, " ' ", plinkrt, " | head -n 1 | cut -d \":\" -f 2", sep="")
+	info <- system(cmd, intern=TRUE)
+	print(info)
+	return(info)
+}
+
+extractInfoAll <- function(snpdat, plinkrt)
+{
+	l <- nrow(snpdat)
+	cmd <- paste("zcat ", gsub("\\*", "1", plinkrt), "_info.txt.gz | head -n 1", sep="")
+	print(cmd)
+	dat <- system(cmd, intern=TRUE)
+	for(i in 1:l)
+	{
+		nom <- paste(gsub("\\*", snpdat$chr[i], plinkrt), "_info.txt.gz", sep="")
+		snp <- snpdat$snp[i]
+		cat(i, ":", snp, "\n")
+		dat <- c(dat, extractInfo(snp, nom))
+	}
+	return(dat)	
 }
 
 
@@ -56,6 +87,8 @@ plinkrt <- ar[2]
 
 snplist <- scan(snplistfile, what="character")
 snpdat <- findChromosomesAll(snplist, plinkrt)
-extractSnpsAll(snpdat, plinkrt)
+dat <- extractSnpsAll(snpdat, plinkrt)
+info <- extractInfoAll(snpdat, plinkrt)
+
 
 # info files
