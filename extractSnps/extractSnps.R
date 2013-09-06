@@ -1,4 +1,10 @@
-# R --args snplist.txt ~/ibimp/arichu/data/imputed/chr\*/arichu_1kg_p1v3_\* outputfile
+# Usage:
+
+# R --no-save --args snpsmall.txt /ibscratch/wrayvisscher/imputation/arichu/data/imputed/chr\*/arichu_1kg_p1v3_\* outputfile < extractSnps.R
+
+# - The first argument is the SNP list (just a list of rs SNP ids and nothing else)
+# - The second argument specifies the root name for the genotype data (in binary plink format). Replace the chromosome number with "\*"
+# - The third argument is the output file root name that you want to save everything to.
 
 
 library(snpStats)
@@ -6,7 +12,7 @@ library(snpStats)
 
 findChromosomes <- function(snp, plinkrt)
 {
-	cmd <- paste("grep -P -m 1 '", snp, "\t' ", plinkrt, ".bim | head -n 1 | cut -d \":\" -f 2 | cut -f 1", sep="")
+        cmd <- paste("grep -P -m 1 '", snp, "\t' ", plinkrt, ".bim | head -n 1 | cut -d \":\" -f 2 | cut -f 1", sep="")
 	cat(snp)
 	chr <- system(cmd, intern=TRUE)
 	cat(" ", chr, "\n")
@@ -45,7 +51,7 @@ extractSnpsAll <- function(snpdat, plinkrt)
 
 	cat(chr[1], ":", snpdat$snp[snpdat$chr == chr[1]], "\n")
 	dat <- extractSnps(snpdat$snp[snpdat$chr == chr[1]], gsub("\\*", chr[1], plinkrt))
-
+	if(l == 1) return(dat)
 	for(i in 2:l)
 	{
 		cat(chr[i], ":", snpdat$snp[snpdat$chr == chr[i]], "\n")
@@ -94,4 +100,17 @@ dat <- extractSnpsAll(snpdat, plinkrt)
 
 
 write.table(info, file=paste(output, "_info.txt", sep=""), row=F, col=F, qu=F)
-write.plink(file.base = output, snps = dat$genotypes, subject.data = dat$fam, chromosome = dat$map$chromosome, position = dat$map$position, allele.1 = dat$map$allele.1, allele.2 = dat$map$allele.2)
+write.plink(file.base = output, 
+	snps = dat$genotypes, 
+	pedigree = dat$fam$pedigree,
+	id = dat$fam$member,
+	father = dat$fam$father,
+	mother = dat$fam$mother,
+	sex = dat$fam$sex,
+	phenotype = dat$fam$affected,
+	chromosome = dat$map$chromosome, 
+	genetic.distance = dat$map$cM, 
+	position = dat$map$position, 
+	allele.1 = dat$map$allele.1, 
+	allele.2 = dat$map$allele.2
+)
