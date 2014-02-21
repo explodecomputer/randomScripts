@@ -1,0 +1,59 @@
+// Pseudo code to perform genome-wide association study (GWAS) on thousands of phenotype
+// One GWAS involves sequentially performing linear regression of a single phenotype against hundreds of thousands of genotypes.
+// The objective here is to rapidly perform thousands of GWASs
+
+
+struct regression
+{
+	int n = number of individuals
+	double beta = regression coefficient
+	double se = standard error
+	double pval = pvalue
+}
+
+
+// This will be the main kernel in the OpenCL implementation
+// Requires x and y to be passed from VRAM to l2 cache
+// In code that I have written previously it is highly beneficial to compress the genotypes to improve IO, e.g. one int contains 16 genotypes (each genotype requires only 2 bits to encode {0, 1, 2, missing})
+
+function regressionCalculation(y, x)
+{
+	n_clean = number of individuals with non-missing y or x
+	double array y_clean[n_clean]
+	double array x_clean[n_clean]
+	regression out
+
+	// perform t test to obtain beta, se, pval, for calculation see, e.g.
+	// http://en.wikipedia.org/wiki/Student's_t-test#Slope_of_a_regression_line
+
+	return out
+}
+
+
+// main routine:
+
+
+int n = number of individuals (~ 2000)
+int m = number of genotype markers (~ 1,000,000)
+int p = number of phenotypes (~ 450,000)
+
+geno = int matrix[n, m]       // {0,1,2, missing}
+phen = double matrix[n, p]
+
+reg = regression matrix[m, p]
+se = double matrix[m, p]
+pval = double matrix[m, p]
+
+for(i in 1:p)
+{
+	y = phen[,i]
+	for(j in 1:m)
+	{
+		x = geno[,j]
+		reg[j, i] = regressionCalculation(y ~ x)
+	}
+}
+
+// print out reg 
+
+
