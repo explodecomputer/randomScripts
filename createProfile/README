@@ -1,0 +1,10 @@
+provide:
+
+list of snps with columns:
+snp, chr, position, pval, effect, allele
+
+rootname of imputation files
+
+output name
+
+Rscript createProfile.R <snplist> <impfiles> <output>
